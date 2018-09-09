@@ -5,39 +5,61 @@ d3.csv('data/HappinessData.csv', function(data) {
     // console.log(dataset, typeof dataset);
     return {
         date: new Date(data.Date),
-        happiness: data.Happiness
+        value: data.Happiness
     }
 }).then(function(dataset) {
     console.log(dataset, typeof dataset, dataset.length);
+    drawChart(dataset);
+});
 
+// LINE Chart
+function drawChart(data) {
+    var svgWidth = 600, svgHeight = 400;
+    var margin = { top: 20, right: 20, bottom: 30, left: 50 };
+    var width = svgWidth - margin.left - margin.right;
+    var height = svgHeight - margin.top - margin.bottom;
 
-// var dataset = [80, 100, 56, 120, 180, 30, 40, 120, 160];
+    var svg = d3.select('svg')
+        .attr("width", svgWidth)
+        .attr("height", svgHeight);
+        
+    var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var svgWidth = 500, svgHeight = 500, barPadding = 1;
-var barWidth = (svgWidth / dataset.length);
+    var x = d3.scaleTime()
+        .rangeRound([0, width]);
 
+    var y = d3.scaleLinear()
+        .rangeRound([height, 0]);
 
-var svg = d3.select('svg')
-    .attr("width", svgWidth)
-    .attr("height", svgHeight);
+    var line = d3.line()
+        .x(function(d) { return x(d.date)})
+        .y(function(d) { return y(d.value)})
+        x.domain(d3.extent(data, function(d) { return d.date }));
+        y.domain(d3.extent(data, function(d) { return d.value }));
 
-var yScale = d3.scaleLinear()
-    .domain([0, d3.max(dataset, (d) => {return d.happiness})])
-    .range([0, svgHeight]);
-    
-var barChart = svg.selectAll("rect")
-    .data(dataset)
-    .enter()
-    .append("rect")
-    .attr("y", function(d) {
-         return svgHeight - yScale(d.happiness)
-    })
-    .attr("height", function(d) { 
-        return yScale(d.happiness); 
-    })
-    .attr("width", barWidth - barPadding)
-    .attr("transform", function (d, i) {
-        var translate = [barWidth * i, 0]; 
-        return "translate("+ translate +")";
-    });
-})
+    g.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x))
+        .select(".domain")
+        .remove();
+
+    g.append("g")
+        .call(d3.axisLeft(y))
+        .append("text")
+        .attr("fill", "#000")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", "0.71em")
+        .attr("text-anchor", "end")
+        .text("Happiness Score");
+
+    g.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("stroke-width", 1.5)
+        .attr("d", line);
+}

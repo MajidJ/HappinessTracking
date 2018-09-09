@@ -14,7 +14,7 @@ d3.csv('data/HappinessData.csv', function(data) {
 
 // LINE Chart
 function drawChart(data) {
-    var svgWidth = 600, svgHeight = 400;
+    var svgWidth = 1000, svgHeight = 400;
     var margin = { top: 20, right: 20, bottom: 30, left: 50 };
     var width = svgWidth - margin.left - margin.right;
     var height = svgHeight - margin.top - margin.bottom;
@@ -36,7 +36,7 @@ function drawChart(data) {
         .x(function(d) { return x(d.date)})
         .y(function(d) { return y(d.value)})
         x.domain(d3.extent(data, function(d) { return d.date }));
-        y.domain(d3.extent(data, function(d) { return d.value }));
+        y.domain([-20, 20]);
 
     g.append("g")
         .attr("transform", "translate(0," + height + ")")

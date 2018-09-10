@@ -85,7 +85,7 @@ function drawChart(data) {
         .append("svg:image")
         .attr("xlink:href", function (d) { return "/images/" + d + ".svg"; })
         .attr("id", function(d) { return "icon-" + d; })
-        .attr("width", 30)
+        .attr("width", 35)
         .attr("x", -50)
         .attr("y", -30)
         .attr("height", svgHeight / axisImages.length)
@@ -143,7 +143,9 @@ function drawChart(data) {
             d1 = data[i],
             d = x0 - d0.date > d1.date - x0 ? d1 : d0;
         focus.transition().duration(45).attr("transform", `translate(${x(d.date) + margin.left}, ${y(d.value) + margin.top})`)
-        // .select("text").text(d.value);
+        .select("text").text(d.value).attr("font-size", "50px").attr("y", -40);
     }
+
+    
 
 }

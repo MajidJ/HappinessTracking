@@ -54,7 +54,7 @@ function drawChart(data) {
         .attr("text-anchor", "end")
         .text("Happiness Score");
 
-    g.append("path")
+    var path = g.append("path")
         .datum(data)
         .attr("fill", "none")
         .attr("stroke", "steelblue")
@@ -62,4 +62,22 @@ function drawChart(data) {
         .attr("stroke-linecap", "round")
         .attr("stroke-width", 1.5)
         .attr("d", line);
+
+    var totalLength = path.node().getTotalLength();
+
+    path
+        .attr("stroke-dasharray", totalLength + " " + totalLength)
+        .attr("stroke-dashoffset", totalLength)
+        .transition()
+        .duration(2000)
+        // .ease("linear")
+        .attr("stroke-dashoffset", 0);
+
+    g.on("click", function(){
+        path      
+        .transition()
+        .duration(2000)
+        // .ease("linear")
+        .attr("stroke-dashoffset", totalLength);
+    });
 }

@@ -14,12 +14,13 @@ d3.csv('data/HappinessData.csv', function(data) {
 
 // LINE Chart
 function drawChart(data) {
-    const svgWidth = 700, svgHeight = 400;
+    const svgWidth = 900, svgHeight = 400;
     const margin = { top: 20, right: 20, bottom: 30, left: 50 };
     const width = svgWidth - margin.left - margin.right;
     const height = svgHeight - margin.top - margin.bottom;
     const tickOverrides = [-21, -14, -7, 0, 7, 14, 21];
-    const axisImages = ["0.svg","1.svg","2.svg","3.svg","4.svg","5.svg","6.svg",]
+    const axisImages = [0,1,2,3,4,5,6];
+    const bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
     const svg = d3.select('svg')
         .attr("width", svgWidth)
@@ -35,7 +36,7 @@ function drawChart(data) {
         .rangeRound([height, 0]);
 
     const line = d3.line()
-        .curve(d3.curveBasis)
+        // .curve(d3.curveBasis)
         .x(function(d) { return x(d.date)})
         .y(function(d) { return y(d.value)})
         x.domain(d3.extent(data, function(d) { return d.date }));
@@ -82,11 +83,12 @@ function drawChart(data) {
     var ticks = svg.select(".axis").selectAll(".tick")
         .data(axisImages)
         .append("svg:image")
-        .attr("xlink:href", function (d) { return "/images/" + d; })
+        .attr("xlink:href", function (d) { return "/images/" + d + ".svg"; })
+        .attr("id", function(d) { return "icon-" + d; })
         .attr("width", 30)
         .attr("x", -50)
         .attr("y", -30)
-        .attr("height", svgHeight / axisImages.length);
+        .attr("height", svgHeight / axisImages.length)
 
     const path = g.append("path")
         .datum(data)
@@ -112,4 +114,36 @@ function drawChart(data) {
         .duration(2000)
         .attr("stroke-dashoffset", totalLength);
     });
+
+    var focus = svg.append("g")
+      .attr("class", "focus")
+      .style("display", "none");
+
+    focus.append("circle")
+        .attr("r", 10)
+        .classed("focusCircle", true);
+
+    focus.append("text")
+        .attr("x", 9)
+        .attr("dy", ".35em");
+
+    svg.append("rect")
+        .attr("class", "overlay")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .on("mouseover", function() { focus.style("display", null); })
+        .on("mouseout", function() { focus.style("display", "none"); })
+        .on("mousemove", mousemove);
+
+    function mousemove() {
+        var x0 = x.invert(d3.mouse(this)[0]),
+            i = bisectDate(data, x0, 1),
+            d0 = data[i - 1],
+            d1 = data[i],
+            d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+        focus.transition().duration(45).attr("transform", `translate(${x(d.date) + margin.left}, ${y(d.value) + margin.top})`)
+        // .select("text").text(d.value);
+    }
+
 }

@@ -3,6 +3,7 @@
   --card-bg-color: #ffffff;
   --graph-axis-color: #e8e8e8;
   --graph-path-color: #474747;
+  --primary-yellow: #ffce00;
 }
 
 body {
@@ -26,4 +27,13 @@ a {
   stroke-linejoin: round;
   stroke-linecap: round;
   stroke-width: 5px;
+}
+
+.overlay {
+  fill: rgba(50, 111, 12, 0);
+  pointer-events: all;
+}
+
+.focusCircle {
+  fill: var(--primary-yellow);
 }

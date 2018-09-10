@@ -1,3 +1,10 @@
+:root {
+  --main-bg-color: #f9f9f9;
+  --card-bg-color: #ffffff;
+  --graph-axis-color: #e8e8e8;
+  --graph-path-color: #474747;
+}
+
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -5,4 +12,18 @@ body {
 
 a {
   color: #00B7FF;
+}
+
+.axis {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: var(--graph-axis-color);
+  shape-rendering: crispEdges;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-width: 5px;
 }

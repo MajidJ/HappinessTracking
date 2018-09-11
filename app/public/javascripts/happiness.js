@@ -42,6 +42,34 @@ function drawChart(data) {
         x.domain(d3.extent(data, function(d) { return d.date }));
         y.domain([-21, 21]);
 
+    // Create the svg:defs element and the main gradient definition.
+    var svgDefs = svg.append('defs');
+
+    var mainGradient = svgDefs.append('linearGradient')
+        .attr('id', 'mainGradient')
+        .attr('x1', '0%')
+        .attr('x2', '0%')
+        .attr('y1', '0%')
+        .attr('y2', '100%');
+
+    // Create the stops of the main gradient. Each stop will be assigned
+    // a class to style the stop using CSS.
+    mainGradient.append('stop')
+        .attr('class', 'stop-blank')
+        .attr('offset', '0');
+
+    mainGradient.append('stop')
+        .attr('class', 'stop-green')
+        .attr('offset', '.15');
+
+    mainGradient.append('stop')
+        .attr('class', 'stop-green')
+        .attr('offset', '.35');
+
+    mainGradient.append('stop')
+        .attr('class', 'stop-blank')
+        .attr('offset', '.5');
+
     // g.append("g")
     //     .attr("transform", "translate(0," + height + ")")
     //     .call(d3.axisBottom(x))
@@ -126,6 +154,12 @@ function drawChart(data) {
     focus.append("text")
         .attr("x", 9)
         .attr("dy", ".35em");
+
+    // svg.append("rect")
+    //     .classed('filled', true)
+    //     .attr("width", width)
+    //     .attr("height", height)
+    //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     svg.append("rect")
         .attr("class", "overlay")

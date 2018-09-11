@@ -4,6 +4,8 @@
   --graph-axis-color: #e8e8e8;
   --graph-path-color: #474747;
   --primary-yellow: #ffce00;
+  --primary-green: #00cf8d;
+  --primary-red: #ff4f70;
 }
 
 body {
@@ -41,12 +43,33 @@ a {
 
 .overlay {
   fill: rgba(50, 111, 12, 0);
+  /* background: linear-gradient(yellow, red); */
   pointer-events: all;
   z-index: 2;
 }
 
 .focusCircle {
   fill: var(--primary-yellow);
+}
+
+.stop-blank {
+  stop-color: #ffffff00;  /* Indigo */
+}
+
+.stop-yellow {
+  stop-color: var(--primary-yellow);  /* Teal */
+}
+
+.stop-green {
+  stop-color: var(--primary-green);  /* Teal */
+}
+
+.stop-red {
+  stop-color: var(--primary-red);  /* Teal */
+}
+
+.filled {
+  fill: url(#mainGradient);
 }
 
 .graph-card-styling {

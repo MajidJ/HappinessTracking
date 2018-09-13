@@ -1,11 +1,11 @@
 
 // const dataSet = [];
 
-d3.csv('data/HappinessData.csv', function(data) {
+d3.csv('data/happiness-daily.csv', function(data) {
     // console.log(dataset, typeof dataset);
     return {
-        date: new Date(data.Date),
-        value: data.Happiness
+        date: new Date(data.date),
+        value: data.happiness
     }
 }).then(function(dataset) {
     console.log(dataset, typeof dataset, dataset.length);
@@ -15,7 +15,7 @@ d3.csv('data/HappinessData.csv', function(data) {
 // LINE Chart
 function drawChart(data) {
     const svgWidth = 900, svgHeight = 400;
-    const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+    const margin = { top: 20, right: 50, bottom: 30, left: 50 };
     const width = svgWidth - margin.left - margin.right;
     const height = svgHeight - margin.top - margin.bottom;
     const tickOverrides = [-21, -14, -7, 0, 7, 14, 21];

@@ -168,7 +168,9 @@ function drawChart(data) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .on("mouseover", function() { focus.style("display", null); })
         .on("mouseout", function() { focus.style("display", "none"); })
-        .on("mousemove", mousemove);
+        .on("mousemove", mousemove)
+        .on("touchmove", mousemove)
+        // .on("click", updateData);
 
     function mousemove() {
         var x0 = x.invert(d3.mouse(this)[0]),
@@ -180,6 +182,37 @@ function drawChart(data) {
         .select("text").text(d.value).attr("font-size", "50px").attr("y", -40);
     }
 
+    // function updateData() {
+
+    //     // Get the data again
+    //     d3.csv('data/happiness-weekly.csv', function(data) {
+    //         // console.log(dataset, typeof dataset);
+    //         return {
+    //             date: new Date(data.date),
+    //             value: data.happiness
+    //         }
+    //     }).then(function(dataset) {
+    //         // Scale the range of the data again 
+    //         x.domain(d3.extent(dataset, function(d) { return d.date; }));
+    //         y.domain([0, d3.max(dataset, function(d) { return d.value; })]);
+
+    //         // Select the section we want to apply our changes to
+    //         var svg = d3.select("body").transition();
+        
+    //         // Make the changes
+    //         svg.select(".line")   // change the line
+    //             .duration(750)
+    //             // .attr("d", valueline(dataset));
+    //         svg.select(".x.axis") // change the x axis
+    //             .duration(750)
+    //             .call(xAxis);
+    //         svg.select(".y.axis") // change the y axis
+    //             .duration(750)
+    //             .call(yAxis);
+    
+    //     });
+        
+    // }
     
 
 }

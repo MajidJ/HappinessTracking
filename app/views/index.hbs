@@ -1,11 +1,11 @@
-<div class="card graph-card-styling">
+<div class="card graph-card-styling" id="graphCard">
     <div class="card-body card-body-styling">
         <div class="row">
             <div class="col-xl-4 col-lg-6 col-md-8 col-sm-10"><h1>Happiness<br>Tracking</h1></div>
             <div class="col-xl-8 col-md-4 col-sm-2">
                 <div class="row switch-styling">
                     <label class="bs-switch">
-                        <input type="checkbox">
+                        <input id="dailyWeeklyCheckbox" type="checkbox">
                         <span class="slider round"></span>
                     </label>
                     <p class="switch-label">Daily</p>
@@ -14,7 +14,7 @@
             {{!-- <div class="col-md-6"></div> --}}
         </div>
         {{!-- </br> --}}
-        <svg class="bar-chart"></svg>
+        <div id="chart"></div>
+        {{!-- </div> --}}
     </div>
-    <div></div>
 </div>

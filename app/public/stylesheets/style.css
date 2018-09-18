@@ -112,3 +112,11 @@ a {
 .switch-styling {
   margin-top: 3em;
 }
+
+.line {
+  fill: none;
+  stroke: var(--graph-path-color);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-width: 3;
+}

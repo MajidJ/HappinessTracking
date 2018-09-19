@@ -124,6 +124,7 @@ const Chart = (function(window, d3) {
     
         path.attr("d", line);
 
+        // Draw line transition on page load first render
         if (firstRender) {
             const totalLength = path.node().getTotalLength();
             path.attr("stroke-dasharray", totalLength + " " + totalLength)
@@ -136,20 +137,6 @@ const Chart = (function(window, d3) {
             path.attr("stroke-dasharray", null)
                 .attr("stroke-dashoffset", null)
         }
-        // const totalLength = path.node().getTotalLength();
-        // path.attr("stroke-dasharray", totalLength + " " + totalLength)
-        //     .attr("stroke-dashoffset", totalLength)
-        //     .raise();
-
-        // Draw line transition on page load
-        // const lineLoaded = document.getElementById("transitioned");;
-        // // console.log(lineLoaded);
-        // if(!lineLoaded) {
-        //     path.transition()
-        //         .duration(2000)
-        //         .attr("stroke-dashoffset", 0)
-        //         .attr("id", "transitioned");
-        // }
 
         svg.select(".y.axis").selectAll("text").remove();
         svg.select(".y.axis").selectAll("image").remove();
@@ -200,12 +187,59 @@ const Chart = (function(window, d3) {
         })
         .style('display', 'block');
     }
+
     // Function - Update data
+    function updateData(isChecked) {
+        let csvFile;
+        // Get new data
+        if (isChecked) {
+            csvFile = "data/happiness-weekly.csv"
+        } else {
+            csvFile = "data/happiness-daily.csv"
+        }
+        d3.csv(csvFile, function(data) {
+            // console.log(dataset, typeof dataset);
+            return {
+                date: new Date(data.date),
+                value: data.happiness
+            }
+        }).then(function(data2) {
+            // Scale the range of the data again 
+            // x.domain(d3.extent(dataset, function(d) { return d.date; }));
+            // y.domain([0, d3.max(dataset, function(d) { return d.value; })]);
+
+            // line.transition()
+            // .duration(2000)
+            // .x(function(d) { return x(d.date) })
+            // .y(function(d) { return y(d.happiness) })
+            // Select the section we want to apply our changes to
+        
+            console.log("Line Data:", line(data))
+            // Make the changes
+            svg.select(".line")
+                .transition()
+                .duration(750)
+                .attrTween('d', function () { 
+                return d3.interpolatePath(d3.select(this).attr('d'), line(data2)); 
+            })
+
+            // svg.select(".line")   // change the line
+            //     .transition(750)
+            //     .attr("d", line(dataset));
+            // svg.select(".x.axis") // change the x axis
+            //     .transition(750)
+            //     .call(xAxis);
+            // svg.select(".y.axis") // change the y axis
+            //     .transition(750)
+            //     .call(yAxis);
+        })
+    }
 
     // Event Listener - checkbox
     const dailyWeeklyCheckbox = document.querySelector("#dailyWeeklyCheckbox");
 
     dailyWeeklyCheckbox.addEventListener("change", function() {
+        updateData(this.checked);
         if (this.checked) {
             console.log("Checkbox checked");
         } else {

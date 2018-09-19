@@ -1,6 +1,10 @@
 const Chart = (function(window, d3) {
     // Variable declarations
-    let data, 
+    let data,
+        data2,
+        dataDaily, 
+        dataWeekly,
+        dataToRender,
         svg, 
         x, 
         y, 
@@ -16,6 +20,7 @@ const Chart = (function(window, d3) {
         locator, 
         chartWrapper, 
         firstRender = true,
+        weeklyCheckboxChecked = false,
         margin = {};
     const tickOverrides = [-21, -14, -7, 0, 7, 14, 21];
     const axisImages = [0,1,2,3,4,5,6];
@@ -23,7 +28,7 @@ const Chart = (function(window, d3) {
 
     // Get default data
     // d3.csv("data/happiness-daily.csv", initGraph);
-    d3.csv('data/happiness-daily.csv', function(data) {
+    d3.csv('data/happiness-weekly.csv', function(data) {
         // console.log(dataset, typeof dataset);
         return {
             date: new Date(data.date),
@@ -31,7 +36,18 @@ const Chart = (function(window, d3) {
         }
     }).then(function(dataset) {
         console.log(dataset, typeof dataset, dataset.length);
-        initGraph(dataset);
+        dataWeekly = dataset;
+        d3.csv('data/happiness-daily.csv', function(data) {
+            // console.log(dataset, typeof dataset);
+            return {
+                date: new Date(data.date),
+                value: +data.happiness
+            }
+        }).then(function(dataset2) {
+            console.log(dataset2, typeof dataset2, dataset2.length);
+            dataDaily = dataset2;
+            initGraph(dataDaily);
+        });
     });
 
     // Function - Initalize graph (csv)
@@ -53,7 +69,7 @@ const Chart = (function(window, d3) {
 
         // path generator for line chart
         line = d3.line()
-            .curve(d3.curveBasis)
+            .curve(d3.curveCatmullRom)
             .x(function(d) { return x(d.date) })
             .y(function(d) { return y(d.value) })
 
@@ -93,11 +109,19 @@ const Chart = (function(window, d3) {
         // get dimensions based on window
         updateDimensions(window.innerWidth);
 
+        if (weeklyCheckboxChecked) {
+            dataToRender = dataWeekly;
+        } else {
+            dataToRender = dataDaily;
+        }
+
+        path.datum(dataToRender);
+
         // update x and y scales
         x.range([0, width]);
         y.range([height, 0]);
 
-        touchScale.domain([0, width]).range([0, data.length-1]).clamp(true);
+        touchScale.domain([0, width]).range([0, dataToRender.length-1]).clamp(true);
 
         // update svg elements to new dimensions
         svg.attr("width", width + margin.right + margin.left)
@@ -190,48 +214,19 @@ const Chart = (function(window, d3) {
 
     // Function - Update data
     function updateData(isChecked) {
-        let csvFile;
-        // Get new data
-        if (isChecked) {
-            csvFile = "data/happiness-weekly.csv"
+        weeklyCheckboxChecked = isChecked;
+
+        if (weeklyCheckboxChecked) {
+            data2 = dataWeekly;
         } else {
-            csvFile = "data/happiness-daily.csv"
+            data2 = dataDaily;
         }
-        d3.csv(csvFile, function(data) {
-            // console.log(dataset, typeof dataset);
-            return {
-                date: new Date(data.date),
-                value: data.happiness
-            }
-        }).then(function(data2) {
-            // Scale the range of the data again 
-            // x.domain(d3.extent(dataset, function(d) { return d.date; }));
-            // y.domain([0, d3.max(dataset, function(d) { return d.value; })]);
 
-            // line.transition()
-            // .duration(2000)
-            // .x(function(d) { return x(d.date) })
-            // .y(function(d) { return y(d.happiness) })
-            // Select the section we want to apply our changes to
-        
-            console.log("Line Data:", line(data))
-            // Make the changes
-            svg.select(".line")
-                .transition()
-                .duration(750)
-                .attrTween('d', function () { 
-                return d3.interpolatePath(d3.select(this).attr('d'), line(data2)); 
-            })
-
-            // svg.select(".line")   // change the line
-            //     .transition(750)
-            //     .attr("d", line(dataset));
-            // svg.select(".x.axis") // change the x axis
-            //     .transition(750)
-            //     .call(xAxis);
-            // svg.select(".y.axis") // change the y axis
-            //     .transition(750)
-            //     .call(yAxis);
+        svg.select(".line")
+            .transition()
+            .duration(750)
+            .attrTween('d', function () { 
+            return d3.interpolatePath(d3.select(this).attr('d'), line(data2)); 
         })
     }
 

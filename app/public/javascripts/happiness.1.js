@@ -5,6 +5,7 @@ const Chart = (function(window, d3) {
         dataDaily, 
         dataWeekly,
         dataToRender,
+        dataHover,
         svg, 
         x, 
         y, 
@@ -20,11 +21,17 @@ const Chart = (function(window, d3) {
         locator, 
         chartWrapper, 
         firstRender = true,
-        weeklyCheckboxChecked = false,
-        margin = {};
+        weeklyCheckboxChecked = false;
+    const margin = {
+        top: 20,
+        right: 50,
+        bottom: 30,
+        left: 50
+    };
     const tickOverrides = [-21, -14, -7, 0, 7, 14, 21];
     const axisImages = [0,1,2,3,4,5,6];
     const breakPoint = 768;
+    const bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
     // Get default data
     // d3.csv("data/happiness-daily.csv", initGraph);
@@ -88,13 +95,14 @@ const Chart = (function(window, d3) {
         chartWrapper.append("g").classed("y axis", true);
         
         // Event Listener - touchmove
-        chartWrapper.on("touchmove", onTouchMove);
-
+        // chartWrapper.on("mousemove", onTouchMove);
+        
         // Locator
         locator = chartWrapper.append("circle")
             .style("display", "none")
             .attr("r", 10)
-            .attr("fill", "#f00");
+            .classed("focusCircle", true)
+            // .attr("fill", "#f00");
 
         touchScale = d3.scaleLinear();
 
@@ -108,13 +116,8 @@ const Chart = (function(window, d3) {
 
         // get dimensions based on window
         updateDimensions(window.innerWidth);
-
-        if (weeklyCheckboxChecked) {
-            dataToRender = dataWeekly;
-        } else {
-            dataToRender = dataDaily;
-        }
-
+        
+        dataToRender = currentDataSet();
         path.datum(dataToRender);
 
         // update x and y scales
@@ -174,6 +177,40 @@ const Chart = (function(window, d3) {
             .attr("x", -50)
             .attr("y", -(svgHeight/(axisImages.length*2)))
             .attr("height", svgHeight / axisImages.length)
+    
+            var focus = svg.append("g")
+            .attr("class", "focus")
+            .style("display", "none");
+      
+        focus.append("circle")
+            .attr("r", 10)
+            .classed("focusCircle", true);
+    
+        focus.append("text")
+            .attr("x", 9)
+            .attr("dy", ".35em");
+      
+        svg.append("rect")
+              .attr("class", "overlay")
+              .attr("width", width)
+              .attr("height", height)
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+              .on("mouseover", function() { focus.style("display", null); })
+              .on("mouseout", function() { focus.style("display", "none"); })
+              .on("mousemove", mousemove)
+              .on("touchmove", mousemove)
+      
+        function mousemove() {
+            dataHover = currentDataSet();
+            const x0 = x.invert(d3.mouse(this)[0]),
+                i = bisectDate(dataHover, x0, 1),
+                d0 = dataHover[i - 1],
+                d1 = dataHover[i],
+                d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            focus.transition().duration(45).attr("transform", `translate(${x(d.date) + margin.left}, ${y(d.value) + margin.top})`)
+            .select("text").text(d.value).attr("font-size", "50px").attr("y", -40);
+        }
+
     }
 
     // Function - Update dimensions (window.innerWidth)
@@ -189,12 +226,6 @@ const Chart = (function(window, d3) {
         } else {
             svgHeight = .7 * svgWidth;
         }
-        margin = {
-            top: 20,
-            right: 50,
-            bottom: 30,
-            left: 50
-        };
 
         height = svgHeight - margin.top - margin.bottom;
         width = svgWidth - margin.right - margin.left;
@@ -202,6 +233,7 @@ const Chart = (function(window, d3) {
 
     // Function - Touchmove event handler
     function onTouchMove() {
+        console.log("TouchMove Called")
         const xPos = d3.touches(this)[0][0];
         const d = data[~~touchScale(xPos)];
     
@@ -216,11 +248,12 @@ const Chart = (function(window, d3) {
     function updateData(isChecked) {
         weeklyCheckboxChecked = isChecked;
 
-        if (weeklyCheckboxChecked) {
-            data2 = dataWeekly;
-        } else {
-            data2 = dataDaily;
-        }
+        // if (weeklyCheckboxChecked) {
+        //     data2 = dataWeekly;
+        // } else {
+        //     data2 = dataDaily;
+        // }
+        data2 = currentDataSet();
 
         svg.select(".line")
             .transition()
@@ -228,6 +261,15 @@ const Chart = (function(window, d3) {
             .attrTween('d', function () { 
             return d3.interpolatePath(d3.select(this).attr('d'), line(data2)); 
         })
+        // render();
+    }
+
+    function currentDataSet() {
+        if (weeklyCheckboxChecked) {
+            return dataWeekly;
+        } else {
+            return dataDaily;
+        }
     }
 
     // Event Listener - checkbox
@@ -241,8 +283,6 @@ const Chart = (function(window, d3) {
             console.log("Unchecked");
         }
     })
-
-
     
     return {
         render: render

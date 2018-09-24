@@ -30,8 +30,17 @@ const Chart = (function(window, d3) {
     };
     const tickOverrides = [-21, -14, -7, 0, 7, 14, 21];
     const axisImages = [0,1,2,3,4,5,6];
-    const breakPoint = 768;
+    const breakPoint = {
+        small: 576,
+        medium: 768,
+        large: 992,
+        extraLarge: 1200
+    }
+
     const bisectDate = d3.bisector(function(d) { return d.date; }).left;
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
 
     // Get default data
     // d3.csv("data/happiness-daily.csv", initGraph);
@@ -136,7 +145,9 @@ const Chart = (function(window, d3) {
         xAxis.scale(x);
         yAxis.scale(y);
 
-        if(window.innerWidth < breakPoint) {
+        if(window.innerWidth < breakPoint.small) {
+            xAxis.ticks(d3.timeMonth.every(3))
+        } else if (window.innerWidth > breakPoint.small && window.innerWidth < breakPoint.medium) {
             xAxis.ticks(d3.timeMonth.every(2))
         } else {
             xAxis.ticks(d3.timeMonth.every(1))
@@ -167,18 +178,33 @@ const Chart = (function(window, d3) {
 
         svg.select(".y.axis").selectAll("text").remove();
         svg.select(".y.axis").selectAll("image").remove();
+        svg.select(".x.axis").selectAll("text").classed("x-tick-text", true);
 
-        svg.select(".y.axis").selectAll(".tick")
+        if (window.innerWidth < breakPoint.small) {
+            svg.select(".y.axis").selectAll(".tick")
             .data(axisImages)
             .append("svg:image")
+            .classed("y-axis-images", true)
+            .attr("xlink:href", function (d) { return "/images/" + d + ".svg"; })
+            .attr("id", function(d) { return "icon-" + d; })
+            .attr("width", 30)
+            .attr("x", -40)
+            .attr("y", -(svgHeight/(axisImages.length*2)))
+            .attr("height", svgHeight / axisImages.length);
+        } else {
+            svg.select(".y.axis").selectAll(".tick")
+            .data(axisImages)
+            .append("svg:image")
+            .classed("y-axis-images", true)
             .attr("xlink:href", function (d) { return "/images/" + d + ".svg"; })
             .attr("id", function(d) { return "icon-" + d; })
             .attr("width", 35)
             .attr("x", -50)
             .attr("y", -(svgHeight/(axisImages.length*2)))
-            .attr("height", svgHeight / axisImages.length)
-    
-            var focus = svg.append("g")
+            .attr("height", svgHeight / axisImages.length);
+        }
+
+        const focus = svg.append("g")
             .attr("class", "focus")
             .style("display", "none");
       
@@ -199,6 +225,28 @@ const Chart = (function(window, d3) {
               .on("mouseout", function() { focus.style("display", "none"); })
               .on("mousemove", mousemove)
               .on("touchmove", mousemove)
+
+        const levelDescriptors = svg.append("g")
+            .classed("levelDescriptor", true)
+            .style("display", "none");
+
+        levelDescriptors.append("rect")
+            .attr("height", 10)
+            .attr("width", 30)
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .classed("levelDescriptorBox", true);
+    
+        levelDescriptors.append("text")
+            .attr("x", 9)
+            .attr("dy", ".35em");
+
+        svg.select(".y.axis").selectAll("image")
+              .on("mouseover", function() { levelDescriptors.style("display", null); })
+              .on("mouseout", function() { levelDescriptors.style("display", "none"); })
+              .on("mousemove", onYAxisTickHover)
+              .on("touchmove", onYAxisTickHover)
+
+        renderLabels();
       
         function mousemove() {
             dataHover = currentDataSet();
@@ -208,9 +256,49 @@ const Chart = (function(window, d3) {
                 d1 = dataHover[i],
                 d = x0 - d0.date > d1.date - x0 ? d1 : d0;
             focus.transition().duration(45).attr("transform", `translate(${x(d.date) + margin.left}, ${y(d.value) + margin.top})`)
-            .select("text").text(d.value).attr("font-size", "50px").attr("y", -40);
+            .select("text").text(`${d.value} ${monthNames[d.date.getMonth()]} ${d.date.getDate()}`).attr("font-size", "50px").attr("y", -40);
+            
         }
 
+        function onYAxisTickHover(tickNumber) {
+            console.log("Tick Hover on tick", tickNumber);
+        }
+
+    }
+
+    const labels = [
+        {
+            x: new Date('06-01-2018'),
+            y: .17,
+            text: 'Test Label 1',
+            orient: 'left'
+        },
+        {
+            x: new Date('07-20-2018'),
+            y: .24,
+            text: 'Test Label 2',
+            orient: 'left'
+        }
+    ]
+    
+      function renderLabels() {
+    
+        const _labels = chartWrapper.selectAll('text.label');
+
+        if(!_labels.length > 0) {
+          _labels
+            .data(labels)
+            .enter()
+            .append('text')
+            .classed('label', true)
+            .attr('x', function(d) { return x(d.x) })
+            .attr('y', function(d) { return y(d.y) })
+            .style('text-anchor', function(d) { return d.orient == 'right' ? 'start' : 'end' })
+            .text(function(d) { return d.text });
+        }
+        _labels
+                .attr('x', function(d) { return x(d.x) })
+                .attr('y', function(d) { return y(d.y) })
     }
 
     // Function - Update dimensions (window.innerWidth)
@@ -255,6 +343,11 @@ const Chart = (function(window, d3) {
         // }
         data2 = currentDataSet();
 
+        if (weeklyCheckboxChecked) {
+            d3.select(".switch-label").text("Weekly Average");
+        } else {
+            d3.select(".switch-label").text("Daily Scores");
+        }
         svg.select(".line")
             .transition()
             .duration(750)

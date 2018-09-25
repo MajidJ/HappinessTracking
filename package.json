@@ -1,0 +1,24 @@
+{
+  "name": "happinesstracking",
+  "version": "1.0.0",
+  "description": "A test of Plottable JS and D3 for charting happiness tracking data",
+  "main": "index.js",
+  "dependencies": {
+    "http-server": "^0.11.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cd app && npm start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MajidJ/HappinessTracking.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MajidJ/HappinessTracking/issues"
+  },
+  "homepage": "https://github.com/MajidJ/HappinessTracking#readme"
+}

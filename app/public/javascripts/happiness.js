@@ -20,6 +20,7 @@ const Chart = (function(window, d3) {
         touchScale, 
         locator, 
         chartWrapper, 
+        dateAndScoreBox,
         firstRender = true,
         weeklyCheckboxChecked = false;
     const margin = {
@@ -114,6 +115,8 @@ const Chart = (function(window, d3) {
             // .attr("fill", "#f00");
 
         touchScale = d3.scaleLinear();
+
+        dateAndScoreBox = svg.append("g");
 
         // render chart
         render();
@@ -226,14 +229,18 @@ const Chart = (function(window, d3) {
             .on("mousemove", mousemove)
             .on("touchmove", mousemove)
 
-        const dateAndScoreBox = svg.append("g")
-            .append("text")
+        const hasScoreBox = dateAndScoreBox.selectAll("text");
+        console.log("hasScoreBox", hasScoreBox.size())
+
+        if (hasScoreBox.empty()) {
+            dateAndScoreBox.append("text")
             // .text("win")
             // .append("rect")
             // .attr("height", svgHeight/(axisImages.length))
             // .attr("width", 100)
             // .attr("fill", "none")
             .attr("transform", `translate(${margin.left*1.5}, ${(svgHeight*6)/(axisImages.length)})`);
+        }
 
         const levelDescriptors = svg.append("g")
             .classed("levelDescriptor", true)
@@ -278,9 +285,9 @@ const Chart = (function(window, d3) {
                 d = x0 - d0.date > d1.date - x0 ? d1 : d0;
             focus.transition().duration(45).attr("transform", `translate(${x(d.date) + margin.left}, ${y(d.value) + margin.top})`)
             if (weeklyCheckboxChecked) {
-                dateAndScoreBox.text(`Score: ${d.value} (Week of ${monthNames[d.date.getMonth()]} ${d.date.getDate()}, ${d.date.getFullYear()})`).attr("font-size", "15px").attr("y", -40);
+                dateAndScoreBox.select("text").text(`Score: ${d.value} (Week of ${monthNames[d.date.getMonth()]} ${d.date.getDate()}, ${d.date.getFullYear()})`).attr("font-size", "15px").attr("y", -40);
             } else {
-                dateAndScoreBox.text(`Score: ${d.value} (${monthNames[d.date.getMonth()]} ${d.date.getDate()}, ${d.date.getFullYear()})`).attr("font-size", "15px").attr("y", -40);
+                dateAndScoreBox.select("text").text(`Score: ${d.value} (${monthNames[d.date.getMonth()]} ${d.date.getDate()}, ${d.date.getFullYear()})`).attr("font-size", "15px").attr("y", -40);
             }
             // .select("text").text(`${d.value} ${monthNames[d.date.getMonth()]} ${d.date.getDate()}`).attr("font-size", "50px").attr("y", -40);
             

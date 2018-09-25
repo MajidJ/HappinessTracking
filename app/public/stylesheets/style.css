@@ -145,6 +145,7 @@ a {
   .graph-card-styling {
     padding: .2em;
     margin-top: 3em;
+    margin-bottom: 5em;
     /* background-color: var(--card-bg-color); */
     display: block;
     position: relative;

@@ -6,6 +6,8 @@
   --primary-yellow: #ffce00;
   --primary-green: #00cf8d;
   --primary-red: #ff4f70;
+  --orange: #ff904f;
+  --dark-green: #00a352;
 }
 
 body {
@@ -95,6 +97,36 @@ a {
   z-index: 0;
 } */
 
+.description-overlay {
+  fill: none;
+}
+
+#extreme-text {
+  fill: var(--primary-red);
+}
+
+#terrible-text {
+  fill: var(--orange);
+}
+
+#bad-text {
+  fill: var(--primary-yellow);
+}
+
+#blah-text {
+  fill: var(--graph-path-color);
+}
+#good-text {
+  fill: var(--primary-green);
+}
+#amazing-text {
+  fill: var(--dark-green);
+}
+#manic-text {
+  fill: var(--primary-yellow);
+}
+
+
 
 .switch-label {
   margin: .5em;
@@ -154,6 +186,9 @@ a {
   .line {
     stroke-width: 3;
   }
+  .levelDescriptor > text{
+    font-size: 1em;
+  }
   /* .y-axis-images {
     width: 35px;
   } */
@@ -163,6 +198,9 @@ a {
 @media (min-width: 768px) {
   .graph-card-styling {
     padding: 3em;
+  }
+  .levelDescriptor > text{
+    font-size: 2em;
   }
 }
 
